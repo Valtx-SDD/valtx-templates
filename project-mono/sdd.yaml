@@ -1,0 +1,29 @@
+schema: 1
+project: template-project
+repo:
+  name: template-project-mono
+  role: mono
+  areas: []
+governance:
+  source: oci://ghcr.io/valtx/governance:1.0.0
+  packs: []
+constitution: constitution.yaml
+specs: specs/
+code:
+  - path: src
+    lang: typescript
+manifest: .sdd/universe.lock.json
+gates:
+  G0: block
+  G1: block
+  G2: block
+  G3: block
+  G4: block
+  G5: block
+  G6: block
+  G7: block
+  G8: warn
+  G9: warn
+  G10: block
+  G11: warn
+  G12: block

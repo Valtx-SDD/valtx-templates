@@ -1,0 +1,10 @@
+hooks:
+  before_implement:
+    - extension: valtx
+      command: valtx.gates.pre
+      optional: false
+      description: Gates de gobernanza antes de implementar
+  after_implement:
+    - extension: valtx
+      command: valtx.gates.post
+      optional: false

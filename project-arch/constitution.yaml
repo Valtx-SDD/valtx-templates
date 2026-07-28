@@ -1,0 +1,5 @@
+version: 1.0.0
+extends: valtx-governance@1.0.0
+owner: arquitectura
+principles: []
+waivers: []
