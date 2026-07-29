@@ -1,15 +1,21 @@
 name: "Valtx SDD Gates"
+
+# Los gates deciden aquí (I3): el resultado no depende de que el hub esté vivo.
+# La publicación de la evidencia es un efecto posterior y nunca tumba el job.
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   gates:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Ejecutar Gates de Gobernanza
-        uses: MiguelGironAltamirano/valtx-sdd-core@main
-        env:
-          VALTX_HUB_URL: https://api.valtx-sdd.duckdns.org
+        uses: Valtx-SDD/valtx-sdd-core@main
         with:
           phase: merge
+          hub-url: https://api.valtx-sdd.duckdns.org
+          # Mismo valor que GATES_WEBHOOK_SECRET en el hub. Sin él la ingesta
+          # se rechaza con 401 y este repo se queda sin evidencia.
+          hub-secret: ${{ secrets.VALTX_HUB_SECRET }}
