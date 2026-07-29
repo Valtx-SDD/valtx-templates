@@ -8,6 +8,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Ejecutar Gates de Gobernanza
-        uses: MiguelGironAltamirano/valtx-sdd-core@v1
+        uses: MiguelGironAltamirano/valtx-sdd-core@main
+        env:
+          VALTX_HUB_URL: https://api.valtx-sdd.duckdns.org
         with:
           phase: merge
