@@ -9,9 +9,7 @@ governance:
   packs: []
 constitution: constitution.yaml
 specs: specs/
-code:
-  - path: src
-    lang: typescript
+
 manifest: .sdd/universe.lock.json
 gates:
   G0: block

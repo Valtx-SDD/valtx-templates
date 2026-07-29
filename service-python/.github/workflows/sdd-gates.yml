@@ -8,6 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Ejecutar Gates de Gobernanza
-        uses: valtx/sdd-gates@v1
+        uses: MiguelGironAltamirano/valtx-sdd-core@v1
         with:
           phase: merge
