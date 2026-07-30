@@ -15,7 +15,10 @@ jobs:
         uses: Valtx-SDD/valtx-sdd-core@main
         with:
           phase: merge
-          hub-url: https://api.valtx-sdd.duckdns.org
+          # Secreto de organización: el dominio del hub no se hornea en
+          # cada repo provisionado (I11). Si falta, la Action avisa y omite
+          # el envío; el veredicto de la CI no cambia (I3).
+          hub-url: ${{ secrets.VALTX_HUB_URL }}
           # Mismo valor que GATES_WEBHOOK_SECRET en el hub. Sin él la ingesta
           # se rechaza con 401 y este repo se queda sin evidencia.
           hub-secret: ${{ secrets.VALTX_HUB_SECRET }}
