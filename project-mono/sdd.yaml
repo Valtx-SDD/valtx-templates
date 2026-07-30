@@ -5,7 +5,7 @@ repo:
   role: mono
   areas: []
 governance:
-  source: oci://ghcr.io/Valtx-SDD/governance:v1.0.0
+  source: oci://ghcr.io/valtx-sdd/governance:v1.0.0
   packs: []
 constitution: constitution.yaml
 specs: specs/
