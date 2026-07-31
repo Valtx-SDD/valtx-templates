@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Ejecutar Gates de Gobernanza
-        uses: Valtx-SDD/valtx-sdd-core@v1.0.0
+        uses: Valtx-SDD/valtx-sdd-core@v0.0.1
         with:
           phase: merge
           # Secreto de organización: el dominio del hub no se hornea en
