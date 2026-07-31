@@ -5,7 +5,7 @@ repo:
   role: arch
   areas: []
 governance:
-  source: oci://ghcr.io/valtx-sdd/governance:v1.0.0
+  source: oci://ghcr.io/valtx-sdd/governance:v1.0.1
   packs: []
 constitution: constitution.yaml
 specs: specs/
