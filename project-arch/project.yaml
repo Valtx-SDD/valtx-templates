@@ -1,4 +1,18 @@
 id: template-project
 topologia: multi-repo
 estado: activo
-areas: {}
+# `repos` y `areas` son obligatorios en `project.schema.json` (`repos` con al
+# menos un elemento, `areas` no vacío). Estaban ausente y vacío respectivamente,
+# así que esta plantilla nunca habría validado — y no lo detectaba nadie porque
+# el repo no tenía CI propio hasta H2.
+#
+# Los valores son placeholders: la provisión los reescribe con el proyecto real
+# (§7.4). Lo que importa es que la forma sea la correcta, porque una plantilla
+# enseña la forma antes que el contenido.
+repos:
+  - name: template-project-arch
+    role: arch
+areas:
+  # AREA -> repo propietario (§3.1). G12 bloquea un REQ cuya área no esté aquí,
+  # y G10 lee este mapa para saber qué repo responde de qué.
+  PAY: template-project-svc

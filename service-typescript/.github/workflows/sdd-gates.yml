@@ -7,18 +7,38 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
+  # Un job por fase del ciclo (§6.2). Antes había uno solo con `phase: merge`,
+  # que mapea a [G1, G9]: la PR se cerraba en verde habiendo ejecutado 2 de los
+  # 13 gates. La matriz cubre los 13 exactamente una vez, y `PHASE_GATES` del
+  # motor tiene un test que exige que la unión de las fases sea el conjunto
+  # completo, así que un gate nuevo no puede quedarse fuera sin romper su CI.
+  #
+  # `tasks` no está: no tiene gates asignados, y un sobre sin gates es un run
+  # que no comprobó nada. Se deja fuera en vez de publicar evidencia vacía.
   gates:
     runs-on: ubuntu-latest
+    strategy:
+      # Sin esto, la primera fase que bloquea cancela las demás y el PR muestra
+      # un veredicto parcial: se pierde justo la evidencia que más falta hace.
+      fail-fast: false
+      matrix:
+        phase: [constitution, specify, plan, implement, merge]
+    name: "gates · ${{ matrix.phase }}"
     steps:
       - uses: actions/checkout@v4
-      - name: Ejecutar Gates de Gobernanza
-        uses: Valtx-SDD/valtx-sdd-core@v0.0.2
         with:
-          phase: merge
-          # Secreto de organización: el dominio del hub no se hornea en
-          # cada repo provisionado (I11). Si falta, la Action avisa y omite
-          # el envío; el veredicto de la CI no cambia (I3).
-          hub-url: ${{ secrets.VALTX_HUB_URL }}
+          # El paso de diff de contratos necesita la rama base para el
+          # `--merge-base`. Con el `fetch-depth: 1` por defecto no siempre hay
+          # ancestro común y el análisis degrada a un aviso silencioso.
+          fetch-depth: 0
+      - name: Ejecutar Gates de Gobernanza
+        uses: Valtx-SDD/valtx-sdd-core@v0.0.3
+        with:
+          phase: ${{ matrix.phase }}
+          # Variable de organización, no secreto: el dominio del hub no es
+          # secreto y no se hornea en cada repo provisionado (I11). Si falta, la
+          # Action avisa y omite el envío; el veredicto de la CI no cambia (I3).
+          hub-url: ${{ vars.VALTX_HUB_URL }}
           # Mismo valor que GATES_WEBHOOK_SECRET en el hub. Sin él la ingesta
           # se rechaza con 401 y este repo se queda sin evidencia.
           hub-secret: ${{ secrets.VALTX_HUB_SECRET }}

@@ -1,0 +1,69 @@
+name: CI
+
+# Este repo no tenía CI. Sus workflows viven dentro de cada plantilla
+# (`<plantilla>/.github/workflows/`), que GitHub no ejecuta porque no están en
+# `.github/workflows/` de la raíz: ninguna PR contra `valtx-templates` corría
+# nada. Por eso `extends: template-project@latest` —que no valida contra el
+# schema y apunta a una constitución inexistente— sobrevivió en cuatro
+# plantillas hasta que un comando del motor lo destapó, en H1.
+#
+# Una plantilla que no cumple el estándar reparte el incumplimiento a cada repo
+# que nace de ella. Esto lo comprueba antes de repartirlo.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  plantillas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Pinneado al mismo tag que usan los workflows que reparten las
+      # plantillas: validarlas con un motor distinto del que las va a juzgar
+      # sería comprobar otra cosa.
+      - name: Instalar el motor
+        run: pip install --quiet "valtx-sdd-core @ git+https://github.com/Valtx-SDD/valtx-sdd-core.git@v0.0.3"
+
+      # La gobernanza se resuelve por `oci://` desde el `governance.source` de
+      # cada plantilla, igual que en un repo real. El paquete es público, así
+      # que no hace falta `docker login`.
+      - name: Validar las 6 plantillas contra los schemas del estándar
+        run: python scripts/validar_plantillas.py
+
+      - name: Que el tag del motor sea el mismo en los 7 workflows
+        run: |
+          refs=$(grep -rho 'Valtx-SDD/valtx-sdd-core@[^ ]*' \
+            _common/.github/workflows/ */.github/workflows/ | sort -u)
+          echo "$refs"
+          if [ "$(echo "$refs" | wc -l)" -ne 1 ]; then
+            echo "::error::los workflows de las plantillas apuntan a refs distintas del motor"
+            exit 1
+          fi
+          # `@main` movería el veredicto de todos los repos provisionados sin
+          # que nadie publique nada (I11).
+          case "$refs" in
+            *@v[0-9]*) ;;
+            *) echo "::error::el motor tiene que ir pinneado a un tag, no a una rama"; exit 1 ;;
+          esac
+
+      - name: Que `_common` siga siendo idéntico a lo que llevan las plantillas
+        run: |
+          fallo=0
+          for f in $(cd _common && find . -type f ! -name '.gitkeep'); do
+            for t in */; do
+              t=${t%/}
+              case "$t" in _common|scripts|.github) continue ;; esac
+              [ -f "$t/$f" ] || continue
+              if ! diff -q "_common/$f" "$t/$f" >/dev/null; then
+                echo "::error file=$t/$f::difiere de _common/$f"
+                fallo=1
+              fi
+            done
+          done
+          exit $fallo

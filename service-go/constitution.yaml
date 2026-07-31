@@ -1,5 +1,16 @@
 version: 1.0.0
-extends: template-project@latest
+# Sin `extends`: una constitución raíz es válida y el schema la admite.
+#
+# Antes aquí ponía `extends: template-project@latest`, que no casa con el patrón
+# `^[a-z0-9-]+@\d+\.\d+\.\d+$` del schema y apunta a una constitución que no
+# existe en ningún sitio. Un repo clonado a mano desde esta plantilla daba G0 en
+# rojo con el mensaje «no se resuelve template-project@latest», que manda a
+# buscar un padre inventado. Sin `extends`, G0 devuelve `sin_datos` diciendo la
+# verdad: no hay herencia que verificar todavía.
+#
+# La provisión sobrescribe este fichero con `extends: <slug>@1.0.0` (§7.4), así
+# que ningún repo creado por el hub nace sin padre. Este valor es el que ve
+# quien clona la plantilla directamente.
 owner: arquitectura
 principles: []
 waivers: []
