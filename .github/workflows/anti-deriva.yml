@@ -1,0 +1,37 @@
+# `_common/` es la unica fuente de los ficheros compartidos desde H4a: el hub
+# los fusiona al provisionar. Este check impide que alguien vuelva a meter una
+# copia divergente dentro de un <kind>/, que es lo que ya obligo una vez a
+# editar siete ficheros identicos a mano.
+name: anti-deriva
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ningún fichero de _common/ está duplicado y divergente en un kind
+        run: |
+          fallos=0
+          for compartido in $(cd _common && find . -type f | sed 's|^\./||'); do
+            for kind in project-* service-* web-*; do
+              [ -d "$kind" ] || continue
+              if [ -f "$kind/$compartido" ] && ! cmp -s "_common/$compartido" "$kind/$compartido"; then
+                echo "::error file=$kind/$compartido::difiere de _common/$compartido"
+                fallos=$((fallos + 1))
+              fi
+            done
+          done
+          if [ "$fallos" -gt 0 ]; then
+            echo "$fallos fichero(s) derivados de _common/"
+            exit 1
+          fi
+          echo "sin deriva"
